@@ -1,20 +1,31 @@
 const Profile = require("./profile");
 const renderer = require('./renderer');
+const querystring = require('querystring');
+
+const commonHeaders = {'Content-Type': 'text/html'};
 
 function home(req, res) {
     if (req.url === "/") {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        renderer.view("header", {}, res);
-        renderer.view("search", {}, res);
-        renderer.view("footer", {}, res);
-        res.end();
+        if (req.method.toLowerCase() === "") {
+            res.writeHead(200, commonHeaders);
+            renderer.view("header", {}, res);
+            renderer.view("search", {}, res);
+            renderer.view("footer", {}, res);
+            res.end();
+        } else {
+            req.on('data', function(postBody) {
+                let query = querystring.parse(postBody.toString());
+                res.write(query.username);
+                res.end();
+            });
+        }
     }
 }
 
 function user(req, res) {
     let username = req.url.replace("/", "");
     if (username.length > 0) {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.writeHead(200, commonHeaders);
         renderer.view("header", {}, res);
 
         let studentProfile = new Profile(username);
