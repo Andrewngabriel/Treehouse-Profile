@@ -6,7 +6,7 @@ const commonHeaders = {'Content-Type': 'text/html'};
 
 function home(req, res) {
     if (req.url === "/") {
-        if (req.method.toLowerCase() === "") {
+        if (req.method.toUpperCase() === "GET") {
             res.writeHead(200, commonHeaders);
             renderer.view("header", {}, res);
             renderer.view("search", {}, res);
@@ -15,7 +15,7 @@ function home(req, res) {
         } else {
             req.on('data', function(postBody) {
                 let query = querystring.parse(postBody.toString());
-                res.write(query.username);
+                res.writeHead(303, {"Location": "/" + query.username});
                 res.end();
             });
         }
